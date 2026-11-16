@@ -1,3 +1,17 @@
 
+[project]
+name = "smart-inventory-api"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115,<1.0",
+    "uvicorn[standard]>=0.30,<1.0",
+    "psycopg2-binary>=2.9,<3.0",
+    "python-dotenv>=1.0,<2.0",
+    "pydantic>=2.8,<3.0",
+    "passlib[bcrypt]>=1.7.4,<2.0",
+    "python-jose[cryptography]>=3.3,<4.0",
+]
+
 [tool.vercel]
 entrypoint = "backend.main:app"
