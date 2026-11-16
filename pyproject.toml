@@ -11,8 +11,8 @@ dependencies = [
     "pydantic>=2.8,<3.0",
     "passlib[bcrypt]>=1.7.4,<2.0",
     "python-jose[cryptography]>=3.3,<4.0",
+    "python-multipart>=0.0.9,<1.0",
 ]
 
 [tool.vercel]
 entrypoint = "backend.main:app"
-"python-multipart>=0.0.9,<1.0",
