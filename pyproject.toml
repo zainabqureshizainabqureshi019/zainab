@@ -15,3 +15,4 @@ dependencies = [
 
 [tool.vercel]
 entrypoint = "backend.main:app"
+"python-multipart>=0.0.9,<1.0",
