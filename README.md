@@ -1,28 +1,72 @@
-# Smart Inventory
+# Smart Inventory & Sales Management System
 
-A modern inventory, purchasing, and sales workspace for supermarket teams, built
-with Streamlit, Python, and Neon PostgreSQL.
+A web-based inventory and sales management application for a local supermarket. The project uses Streamlit for the user interface, Python for application logic, Neon PostgreSQL for persistent data, and FastAPI for a separately deployed backend API.
+
+## Live application
+
+- **Streamlit application:** https://smart-inventory-zainab.streamlit.app/
+- **FastAPI Swagger documentation:** https://zainab-two.vercel.app/docs
+- **GitHub repository:** https://github.com/zainabqureshizainabqureshi019/zainab
+
+## Technology stack
+
+| Layer | Technology |
+|---|---|
+| Frontend / UI | Streamlit |
+| Application logic | Python |
+| Backend API | FastAPI |
+| Database | Neon PostgreSQL |
+| Data handling | Pandas |
+| Charts | Plotly |
+| API hosting | Vercel |
+| Frontend hosting | Streamlit Community Cloud |
 
 ## Features
 
-- Business overview with daily sales, stock totals, and low-stock alerts
-- Product catalogue, opening stock, categories, and suppliers
+- Business dashboard with active products, stock totals, low-stock alerts, and sales overview
+- Product catalogue with SKU, category, pricing, supplier, and stock information
 - Inventory monitoring and replenishment visibility
-- Multi-product checkout that validates and updates stock
-- Print-ready A4 bills for recent sales, with PDF saving through the browser
+- Sales entry and multi-product checkout
 - Purchase entry with supplier and cost tracking
-- Customer records and staff account management
-- Sales and stock reports with CSV exports and a 30-day sales summary
+- Category, customer, and supplier management
+- Staff accounts and role-based page access
+- Sales and stock reports with CSV exports
+- Print-ready sales bills
 
-## Requirements
+## Project structure
 
-- Python 3.10 or newer
+```text
+.
+├── app.py                 # Streamlit application entry point
+├── db.py                  # PostgreSQL database helpers
+├── styles.py              # UI styling
+├── views/                 # Streamlit application pages
+├── backend/               # FastAPI backend
+├── schema.sql             # PostgreSQL database schema
+├── requirements.txt       # Python dependencies
+├── pyproject.toml         # Backend project and Vercel configuration
+├── Dockerfile
+└── .env.example           # Example environment configuration
+```
+
+## Architecture and deployment
+
+- The **Streamlit frontend** is deployed on Streamlit Community Cloud.
+- The **FastAPI backend** is deployed on Vercel.
+- **Neon PostgreSQL** stores the application's data.
+- The current Streamlit database helper (`db.py`) connects directly to Neon using `DATABASE_URL`. The separately deployed FastAPI API is available through its Swagger documentation; frontend-to-API integration is not currently documented as complete.
+
+## Run locally
+
+### 1. Requirements
+
+- Python compatible with the packages in `requirements.txt`
 - A Neon PostgreSQL database
-- VS Code (recommended)
+- Git and VS Code (recommended)
 
-## Set up the Python environment
+### 2. Create and activate a virtual environment
 
-Windows PowerShell, from this project folder:
+Windows PowerShell, from the project folder:
 
 ```powershell
 py -m venv .venv
@@ -31,84 +75,71 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-If `py` is not recognized, install Python from python.org and enable the PATH option, then reopen VS Code.
-
-## Set up the database
+### 3. Set up the database
 
 1. Open your Neon project and select **SQL Editor**.
-2. Open `schema.sql` from this folder, copy its complete contents into the Neon SQL Editor and run it once.
-3. In Neon, open **Connection Details** and copy the PostgreSQL connection string. Use the pooled connection string if your Neon screen offers one; ensure SSL is enabled.
+2. Open `schema.sql` in this repository.
+3. Run the schema in Neon if it has not already been applied. Do not repeatedly drop or recreate existing tables.
+4. Copy your Neon PostgreSQL connection string from **Connection Details** and ensure SSL is enabled.
 
-## Configure the database connection
+### 4. Configure the database connection
 
-Create a file named `.env` in the same folder as `app.py` by copying `.env.example`.
+Create a local `.env` file beside `app.py` using `.env.example` as a guide, then set:
 
-Put your own Neon connection string on the `DATABASE_URL=` line. Do not share `.env`, screenshots containing the password, or commit it to GitHub. The `.gitignore` already excludes `.env`.
+```env
+DATABASE_URL=your-neon-connection-string
+```
 
-Alternatively, create `.streamlit/secrets.toml` with:
+Alternatively, create `.streamlit/secrets.toml`:
 
 ```toml
 DATABASE_URL = "your-neon-connection-string"
 ```
 
-## Run locally
+Never commit `.env` or `secrets.toml` to GitHub. Never publish database passwords, JWT secrets, access tokens, or screenshots containing secret values.
+
+### 5. Start the Streamlit app
 
 ```powershell
-.\.venv\Scripts\streamlit.exe run app.py
+streamlit run app.py
 ```
 
-Streamlit will show a local URL, usually `http://localhost:8501`.
+The local app is usually available at http://localhost:8501.
 
-If you activated the virtual environment first, `streamlit run app.py` works too.
+## Deployment configuration
 
-## Deploy on Railway
+### Streamlit Community Cloud
 
-This project includes a Dockerfile that listens on Railway's assigned `PORT`.
-Before deploying, rotate any database password that has been shared and use
-only the new Neon connection string.
+1. Connect the GitHub repository to Streamlit Community Cloud.
+2. Select branch `main` and main file `app.py`.
+3. Add `DATABASE_URL` in the app's **Settings → Secrets** using valid TOML syntax:
 
-1. Install the Railway CLI using the [official installation guide](https://docs.railway.com/cli#installing-the-cli).
-2. Open PowerShell in this project folder and sign in:
-
-   ```powershell
-   railway login
+   ```toml
+   DATABASE_URL = "your-neon-connection-string"
    ```
 
-3. Create and select a Railway project, then upload the application:
+4. Save the secret and check the deployed app.
 
-   ```powershell
-   railway init
-   railway up
-   ```
+### Vercel (FastAPI backend)
 
-4. In the Railway project, open the app service's **Variables** and add
-   `DATABASE_URL` with the new Neon connection string. Never upload `.env` or
-   paste the connection string into source code.
-5. In the service's **Settings → Networking**, generate a public domain. Open
-   the generated URL to access the app from other devices.
+1. Import the GitHub repository into Vercel.
+2. Use the FastAPI project configuration in `pyproject.toml`.
+3. Configure the required environment variables in Vercel Project Settings. Keep their values private.
+4. Deploy from the `main` branch and verify the API through the Swagger URL above.
 
-Railway account plans, trial allowances, and usage-based charges can change.
-Check the current pricing and limits before deploying.
+## Recommended first-use workflow
 
-## Initial administrator sign-in
-
-- Username: `admin`
-- Temporary password: `ChangeMe123!`
-
-Change this password immediately from **Account & Users** after signing in. The initial admin is inserted by `schema.sql` only if the username does not already exist.
-
-## Recommended setup order
-
-1. Change the administrator password.
+1. Sign in with an authorized account and change any temporary/default password immediately.
 2. Add suppliers and categories.
-3. Add customers (optional; walk-in sales are supported).
+3. Add customers when needed; walk-in sales are supported.
 4. Add products and opening stock.
 5. Record purchases when new stock arrives.
-6. Record sales; the app checks stock and deducts sold quantities.
-7. Review Dashboard and Reports & Analytics.
+6. Record sales and review stock updates.
+7. Review the Dashboard and Reports & Analytics.
 
-## Operational notes
+## Security and operational notes
 
-- Run `schema.sql` once before starting the app. Do not repeatedly drop or recreate tables.
-- Sales and purchase entries update their related stock within a single database transaction.
-- This is a learning/development baseline. Before real commercial deployment, add backups, audit logs, stronger role permissions, tax/receipt rules, and deployment secrets management.
+- Keep database connection strings and JWT signing secrets in hosting-provider secrets/environment settings, never in source code.
+- If a temporary or default account password has been used, change it before sharing the live app.
+- Back up the database regularly and restrict access to authorized users.
+- Before real commercial use, review audit logging, role permissions, tax and receipt requirements, data backups, and operational security.
